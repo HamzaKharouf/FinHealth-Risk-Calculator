@@ -1,0 +1,16 @@
+{
+  "name": "finhealth-risk-calculator",
+  "version": "1.0.0",
+  "description": "Financial Risk Assessment Calculator",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'No build step needed'"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
