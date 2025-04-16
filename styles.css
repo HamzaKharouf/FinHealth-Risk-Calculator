@@ -128,41 +128,407 @@ label {
     margin-bottom: 0.5rem;
 }
 
+.report-sections {
+    display: grid;
+    gap: 25px;
+    margin-top: 30px;
+}
+
 .report-section {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 25px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+.report-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.05)
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.report-section:hover {
+    transform: translateY(-5px) scale(1.02);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #4FC3F7;
+    box-shadow: 
+        0 15px 30px rgba(0, 0, 0, 0.2),
+        0 0 20px rgba(79, 195, 247, 0.2) inset;
+}
+
+.report-section:hover::before {
+    transform: translateX(0);
 }
 
 .report-section h5 {
-    color: #00b4db;
-    margin-bottom: 15px;
+    color: #4FC3F7;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 .report-section p {
-    color: #e0e0e0;
+    color: #FFFFFF;
+    font-size: 1.1rem;
     line-height: 1.6;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .points-list {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 15px;
+    display: grid;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-.points-list li {
+.points-display {
     background: rgba(255, 255, 255, 0.08);
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    border-radius: 8px;
+    padding: 15px 20px;
+    border-radius: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #e0e0e0;
+    color: #E0E0E0;
+    font-size: 1.05rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.points-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(79, 195, 247, 0.1),
+        transparent
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.points-display:hover {
+    transform: translateX(10px) scale(1.02);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #4FC3F7;
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.2),
+        0 0 15px rgba(79, 195, 247, 0.2);
+    color: #FFFFFF;
+}
+
+.points-display:hover::before {
+    transform: translateX(100%);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.report-section {
+    animation: fadeInUp 0.6s ease forwards;
+    animation-delay: calc(var(--animation-order) * 0.1s);
+    opacity: 0;
+}
+
+.report-title {
+    color: #4FC3F7;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
+}
+
+/* Remove if it exists */
+.recommendations-title {
+    display: none;
+}
+
+/* Update the question container styling */
+#questionContainer {
+    position: relative;
+    padding-top: 1rem;  /* Reduced from 3rem */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+/* Adjust back to home button positioning and styling */
+#backToHome {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.8rem 1.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 2rem;
+    z-index: 10;
+}
+
+/* Update question container to accommodate the new button position */
+#questionContainer {
+    position: relative;
+    padding-top: 1rem;
+    padding-bottom: 5rem; /* Add space for the centered button */
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+#backToHome:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+#homePage {
+    padding: 4rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 25px;
+    backdrop-filter: blur(15px);
+    margin-top: 3rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#homePage h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #ffffff, #00b4db);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+}
+
+#homePage .lead {
+    font-size: 1.4rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 3.5rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.list-unstyled li {
+    font-size: 1.2rem;
+    padding: 1.2rem 2rem;
+    margin: 1rem 0;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transform-origin: left center;
+}
+
+.list-unstyled li:hover {
+    transform: translateX(10px) scale(1.05);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(0, 180, 219, 0.4);
+    box-shadow: 
+        0 5px 15px rgba(0, 180, 219, 0.2),
+        0 0 30px rgba(0, 180, 219, 0.1) inset;
+    animation: pulseGlow 1.5s infinite;
+}
+
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 
+            0 5px 15px rgba(0, 180, 219, 0.2),
+            0 0 30px rgba(0, 180, 219, 0.1) inset;
+    }
+    50% {
+        box-shadow: 
+            0 5px 25px rgba(0, 180, 219, 0.4),
+            0 0 50px rgba(0, 180, 219, 0.2) inset;
+    }
+    100% {
+        box-shadow: 
+            0 5px 15px rgba(0, 180, 219, 0.2),
+            0 0 30px rgba(0, 180, 219, 0.1) inset;
+    }
+}
+
+.list-unstyled li:nth-child(1)::before {
+    content: "📊";  /* Chart emoji for risk assessment */
+}
+
+.list-unstyled li:nth-child(2)::before {
+    content: "📈";  /* Trending up for investment */
+}
+
+.list-unstyled li:nth-child(3)::before {
+    content: "🛡️";  /* Shield for emergency preparedness */
+}
+
+.list-unstyled li:nth-child(4)::before {
+    content: "🎯";  /* Target for long-term planning */
+}
+
+.list-unstyled li:nth-child(5)::before {
+    content: "🎓";  /* Graduation cap for knowledge */
+}
+
+.list-unstyled li::before {
+    margin-right: 1.5rem;
+    font-size: 1.6rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.list-unstyled li:hover::before {
+    transform: scale(1.3) rotate(10deg);
+    filter: brightness(1.2);
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.7);
+}
+
+.list-unstyled li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00b4db, transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+}
+
+.list-unstyled li:hover::after {
+    transform: translateX(100%);
+}
+
+#startAssessment {
+    background: linear-gradient(45deg, #00b4db, #0083b0);
+    border: none;
+    padding: 1.4rem 4rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    border-radius: 50px;
+    box-shadow: 0 8px 25px rgba(0, 180, 219, 0.4);
+    transition: all 0.4s ease;
+    margin-top: 2rem;
+}
+
+#startAssessment:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(0, 180, 219, 0.6);
+    background: linear-gradient(45deg, #0083b0, #00b4db);
+}
+
+@media (max-width: 768px) {
+    #homePage {
+        padding: 3rem 1.5rem;
+    }
+
+    #homePage h1 {
+        font-size: 2.8rem;
+    }
+
+    .list-unstyled li {
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    #startAssessment {
+        padding: 1.2rem 3rem;
+        font-size: 1.2rem;
+    }
+}
+
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100% }
+    100% { left: 100% }
+}
+
+.risk-meter-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    height: 300px;
+}
+
+.score-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+}
+
+.score-display .percentage {
+    font-size: 3rem;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.score-display .category {
+    font-size: 1.2rem;
+    opacity: 0.9;
 }
 
 .disclaimer {
@@ -218,4 +584,150 @@ label {
     font-weight: 600;
     margin-bottom: 1.5rem;
     text-align: left;
+}
+
+/* Question styling */
+.form-check {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.form-check:hover {
+    transform: translateX(10px) scale(1.02);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #4FC3F7;
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.2),
+        0 0 15px rgba(79, 195, 247, 0.2);
+}
+
+.form-check-input {
+    margin-right: 12px;
+}
+
+/* Update question text color */
+#questionTitle {
+    color: #ffffff;  /* White color for the question title */
+    font-weight: 600;
+}
+
+#questionText {
+    color: #ffffff;  /* White color for the question text */
+    font-size: 1.2rem;
+}
+
+.form-check-label {
+    color: #ffffff;  /* White color for the answer options */
+}
+
+.modal .form-check-label {
+    color: #333;  /* Ensures the modal checkbox text is dark */
+    font-weight: 500;  /* Makes the text slightly bolder */
+}
+
+.form-check:hover .form-check-label {
+    color: #4FC3F7;
+}
+
+/* Question counter styling */
+.question-counter {
+    color: #4FC3F7;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Adjust the form-check container for better alignment */
+.form-check {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px 15px 45px;  /* Increased left padding to make room for radio */
+    margin-bottom: 12px;
+    position: relative;  /* Added for absolute positioning of radio */
+}
+
+/* Custom radio button styling */
+.form-check-input[type="radio"] {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    left: 10px;  /* Position radio button outside */
+    top: 50%;
+    transform: translateY(-50%);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.form-check-input[type="radio"]:checked {
+    background-color: #4FC3F7;
+    border-color: #4FC3F7;
+    box-shadow: 0 0 15px rgba(79, 195, 247, 0.4);
+}
+
+.form-check-input[type="radio"]:hover {
+    border-color: #4FC3F7;
+    box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
+}
+
+.form-check-label {
+    margin-left: 0;  /* Remove left margin since we're using padding */
+    margin-top: 0;
+    width: 100%;  /* Allow label to take full width */
+}
+.modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    border: 1px solid rgba(0, 180, 219, 0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 180, 219, 0.2);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 180, 219, 0.2);
+}
+
+.instruction-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.instruction-list li {
+    padding: 8px 0;
+    color: #333;
+    position: relative;
+    padding-left: 25px;
+}
+
+.instruction-list li:before {
+    content: '•';
+    color: #00b4db;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.modal-title {
+    color: #00b4db;
+    font-weight: 600;
+}
+
+.modal .form-check-input {
+    background-color: #fff;  /* White background */
+    border: 2px solid #00b4db;  /* Blue border */
+}
+
+.modal .form-check-input:checked {
+    background-color: #00b4db;  /* Blue background when checked */
+    border-color: #00b4db;
 }
