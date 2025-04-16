@@ -1,4 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Add this at the beginning of your existing DOMContentLoaded function
+    const instructionsModal = new bootstrap.Modal(document.getElementById('instructionsModal'));
+    const instructionsCheck = document.getElementById('instructionsCheck');
+    const startAfterInstructions = document.getElementById('startAfterInstructions');
+    
+    // Modify the existing start assessment click handler
+    document.getElementById('startAssessment').addEventListener('click', () => {
+        instructionsModal.show();
+    });
+
+    // Add these new event listeners
+    instructionsCheck.addEventListener('change', (e) => {
+        startAfterInstructions.disabled = !e.target.checked;
+    });
+
+    startAfterInstructions.addEventListener('click', () => {
+        instructionsModal.hide();
+        homePage.classList.add('d-none');
+        questionContainer.classList.remove('d-none');
+        showQuestion(0);
+    });
+
     const questions = [
         {
             id: 'ageGroup',
@@ -36,23 +58,23 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             id: 'financialPlanning',
             title: 'Financial Planning',
-            question: 'How do you manage your finances?',
+            question: 'How do you manage your finances to ensure you are financially prepared for the future?',
             options: [
-                { value: 'strict', label: 'Strict budget and tracking' },
-                { value: 'flexible', label: 'Flexible budget' },
-                { value: 'rough', label: 'Rough planning' },
-                { value: 'none', label: 'No specific planning' }
+                { value: 'strict', label: 'I follow a detailed monthly budget and track every expense' },
+                { value: 'flexible', label: 'I have a budget, but I allow flexibility for unexpected expenses' },
+                { value: 'rough', label: 'I have a general idea of my income and spending but don\'t track it strictly' },
+                { value: 'none', label: 'I don\'t actively plan or track my finances' }
             ]
         },
         {
             id: 'riskPreference',
-            title: 'Risk Preference',
-            question: 'When given a choice, which option would you choose?',
+            title: 'Investment Risk Preference',
+            question: 'In an investment scenario, which of these options would you be most comfortable with?',
             options: [
-                { value: 'guaranteed', label: 'A small, guaranteed reward' },
-                { value: 'moderate', label: 'A 50% chance for moderate reward' },
-                { value: 'high', label: 'A 20% chance for large reward' },
-                { value: 'none', label: 'I prefer not to take risks' }
+                { value: 'guaranteed', label: 'A guaranteed 5% annual return with minimal risk' },
+                { value: 'moderate', label: 'A 50% chance to earn 15% return, or break even' },
+                { value: 'high', label: 'A 20% chance to earn 40% return, but could lose 10%' },
+                { value: 'none', label: 'I would rather keep my money in a savings account' }
             ]
         },
         {
@@ -137,8 +159,10 @@ document.addEventListener('DOMContentLoaded', function() {
         options: {
             cutout: '80%',
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: { enabled: false }
             }
         }
     });
@@ -147,6 +171,21 @@ document.addEventListener('DOMContentLoaded', function() {
         homePage.classList.add('d-none');
         questionContainer.classList.remove('d-none');
         showQuestion(0);
+    });
+
+    document.getElementById('restartAssessment').addEventListener('click', () => {
+        // Reset all responses
+        Object.keys(responses).forEach(key => delete responses[key]);
+        currentQuestion = 0;
+        
+        // Hide results and show home page
+        resultsPage.classList.add('d-none');
+        homePage.classList.remove('d-none');
+        
+        // Reset the risk meter
+        riskMeter.data.datasets[0].data = [0, 100];
+        riskMeter.data.datasets[0].backgroundColor = ['#4CAF50', '#ecf0f1'];
+        riskMeter.update();
     });
 
     prevButton.addEventListener('click', () => {
@@ -175,6 +214,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function showQuestion(index) {
         currentQuestion = index;
         const question = questions[index];
+    
+        // Update question counter (now only updates one counter)
+        document.getElementById('currentQuestionNum').textContent = index + 1;
+        document.getElementById('totalQuestions').textContent = questions.length;
 
         const progress = ((index + 1) / questions.length) * 100;
         progressBar.style.width = `${progress}%`;
@@ -255,43 +298,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateDisplay(result) {
         const colors = {
-            low: '#4CAF50',
-            moderate: '#FFC107',
-            high: '#FF5722',
-            veryHigh: '#F44336'
+            excellent: '#4CAF50',
+            good: '#8BC34A',
+            average: '#FFC107',
+            needsImprovement: '#FF5722'
         };
 
-        let color = colors.low;
+        let color = colors.needsImprovement;
         let category = '';
 
-        if (result.score <= 20) {
-            category = 'Very High Risk';
-            color = colors.veryHigh;
-        } else if (result.score <= 50) {
-            category = 'High Risk';
-            color = colors.high;
-        } else if (result.score <= 75) {
-            category = 'Moderate Risk';
-            color = colors.moderate;
+        if (result.score >= 90) {
+            category = 'Excellent';
+            color = colors.excellent;
+        } else if (result.score >= 70) {
+            category = 'Good';
+            color = colors.good;
+        } else if (result.score >= 50) {
+            category = 'Average';
+            color = colors.average;
         } else {
-            category = 'Low Risk';
-            color = colors.low;
+            category = 'Needs Improvement';
+            color = colors.needsImprovement;
         }
 
+        // Update risk meter and score display
         riskMeter.data.datasets[0].data = [result.score, 100 - result.score];
-        riskMeter.data.datasets[0].backgroundColor[0] = color;
+        riskMeter.data.datasets[0].backgroundColor = [color, '#ecf0f1'];
         riskMeter.update();
 
-        riskScore.innerHTML = `
-            <h4>Risk Score: ${result.score}</h4>
-            <p class="risk-category">Category: ${category}</p>
-            <div class="disclaimer mt-3">
-                <p class="text-warning"><i class="fas fa-info-circle"></i> This assessment provides general guidance only. For accurate financial advice tailored to your specific situation, please consult with a qualified financial advisor.</p>
-            </div>
+        // Update the score display
+        const scoreDisplay = document.querySelector('.score-display');
+        scoreDisplay.innerHTML = `
+            <div class="percentage" style="color: ${color}">${Math.round(result.score)}%</div>
+            <div class="category" style="color: ${color}">Category: ${category}</div>
         `;
 
-        recommendations.innerHTML = `
-            <h3 class="assessment-title mb-4">Detailed Assessment Report</h3>
+        // Add disclaimer
+        const riskScore = document.querySelector('#riskScore');
+        riskScore.innerHTML = `
+            <div class="disclaimer mt-3">
+                <p><i class="fas fa-info-circle"></i> This assessment provides general guidance only. For accurate financial advice tailored to your specific situation, please consult with a qualified financial advisor.</p>
+            </div>
         `;
     }
 
@@ -314,45 +361,45 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         const reportHTML = `
-            <div class="report-sections mt-4">
-                <div class="report-section p-3 mb-4">
+            <div class="report-sections">
+                <div class="report-section">
                     <h5>Financial Health Overview</h5>
                     <p>${getFinancialAnalysis(responses)}</p>
-                    <ul class="points-list">
-                        <li>Age Group: ${getPointsEarned('ageGroup', responses.ageGroup)}/10 points</li>
-                        <li>Income Source: ${getPointsEarned('incomeSource', responses.incomeSource)}/10 points</li>
-                        <li>Savings Behavior: ${getPointsEarned('savingsBehavior', responses.savingsBehavior)}/15 points</li>
-                    </ul>
+                    <div class="points-list">
+                        <div class="points-display">Age Group: ${getPointsEarned('ageGroup', responses.ageGroup)}/10 points</div>
+                        <div class="points-display">Income Source: ${getPointsEarned('incomeSource', responses.incomeSource)}/10 points</div>
+                        <div class="points-display">Savings Behavior: ${getPointsEarned('savingsBehavior', responses.savingsBehavior)}/15 points</div>
+                    </div>
                 </div>
-                <div class="report-section p-3 mb-4">
+                <div class="report-section">
                     <h5>Investment Profile</h5>
                     <p>${getInvestmentAnalysis(responses)}</p>
-                    <ul class="points-list">
-                        <li>Risk Preference: ${getPointsEarned('riskPreference', responses.riskPreference)}/10 points</li>
-                        <li>Investment Response: ${getPointsEarned('investmentResponse', responses.investmentResponse)}/10 points</li>
-                    </ul>
+                    <div class="points-list">
+                        <div class="points-display">Risk Preference: ${getPointsEarned('riskPreference', responses.riskPreference)}/10 points</div>
+                        <div class="points-display">Investment Response: ${getPointsEarned('investmentResponse', responses.investmentResponse)}/10 points</div>
+                    </div>
                 </div>
-                <div class="report-section p-3 mb-4">
+                <div class="report-section">
                     <h5>Planning & Preparedness</h5>
                     <p>${getPlanningAnalysis(responses)}</p>
-                    <ul class="points-list">
-                        <li>Financial Planning: ${getPointsEarned('financialPlanning', responses.financialPlanning)}/10 points</li>
-                        <li>Emergency Preparedness: ${getPointsEarned('emergencyPreparedness', responses.emergencyPreparedness)}/10 points</li>
-                        <li>Future Planning: ${getPointsEarned('futurePlanning', responses.futurePlanning)}/5 points</li>
-                    </ul>
+                    <div class="points-list">
+                        <div class="points-display">Financial Planning: ${getPointsEarned('financialPlanning', responses.financialPlanning)}/10 points</div>
+                        <div class="points-display">Emergency Preparedness: ${getPointsEarned('emergencyPreparedness', responses.emergencyPreparedness)}/10 points</div>
+                        <div class="points-display">Future Planning: ${getPointsEarned('futurePlanning', responses.futurePlanning)}/5 points</div>
+                    </div>
                 </div>
-                <div class="report-section p-3 mb-4">
-                    <h5>Knowledge & Education</h5>
+                <div class="report-section">
+                    <h5>Financial Goals & Knowledge</h5>
                     <p>${getKnowledgeAnalysis(responses)}</p>
-                    <ul class="points-list">
-                        <li>Financial Knowledge: ${getPointsEarned('financialKnowledge', responses.financialKnowledge)}/10 points</li>
-                        <li>Financial Goals: ${getPointsEarned('financialGoals', responses.financialGoals)}/10 points</li>
-                    </ul>
+                    <div class="points-list">
+                        <div class="points-display">Financial Goals: ${getPointsEarned('financialGoals', responses.financialGoals)}/10 points</div>
+                        <div class="points-display">Financial Knowledge: ${getPointsEarned('financialKnowledge', responses.financialKnowledge)}/10 points</div>
+                    </div>
                 </div>
             </div>
         `;
 
-        recommendations.innerHTML += reportHTML;
+        recommendations.innerHTML = reportHTML;
     }
 
     function getFinancialAnalysis(responses) {
@@ -370,13 +417,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getInvestmentAnalysis(responses) {
         const analyses = {
-            conservative: "Your investment approach is conservative, focusing on security.",
-            moderate: "You maintain a balanced approach to investment risks and rewards.",
-            aggressive: "You show comfort with investment risks, seeking higher returns."
+            conservative: "You prefer a conservative investment approach, choosing guaranteed returns of 5% with minimal risk. This indicates a strong preference for financial security over potentially higher returns.",
+            moderate: "You show a balanced risk approach, being comfortable with a 50-50 chance for a 15% return. This suggests you understand and accept moderate market fluctuations.",
+            aggressive: "You demonstrate comfort with higher risk, willing to pursue a 40% return despite a potential 10% loss. This indicates a higher risk tolerance for potentially greater rewards.",
+            none: "You prefer keeping your money in a savings account, indicating a very conservative approach to financial management."
         };
 
         const riskLevel = responses.riskPreference === 'guaranteed' ? 'conservative' :
-                         responses.riskPreference === 'moderate' ? 'moderate' : 'aggressive';
+                       responses.riskPreference === 'moderate' ? 'moderate' :
+                       responses.riskPreference === 'high' ? 'aggressive' : 'none';
 
         return analyses[riskLevel];
     }
@@ -406,4 +455,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return analyses[knowledgeLevel];
     }
+
+    // Add this event listener for the back to home button
+    document.getElementById('backToHome').addEventListener('click', () => {
+        // Reset all responses
+        Object.keys(responses).forEach(key => delete responses[key]);
+        currentQuestion = 0;
+        
+        // Hide question container and show home page
+        questionContainer.classList.add('d-none');
+        homePage.classList.remove('d-none');
+        
+        // Reset the form
+        riskForm.innerHTML = '';
+    });
 });
